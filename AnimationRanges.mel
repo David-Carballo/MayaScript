@@ -1,0 +1,67 @@
+if (`window -exists AnimationRanges`) deleteUI AnimationRanges;
+window -w 80 -h 40 -sizeable 0 AnimationRanges;
+
+columnLayout;
+
+    text -label ("Load/Save the following parameters: \n");
+    text -label ("- Start time animation");
+    text -label ("- End time animation");    
+    text -label ("- Start time playback range");    
+    text -label ("- End time playback range\n\n");
+    
+    rowLayout -numberOfColumns 2 -columnWidth 200 200;
+    
+        button -w 200 -h 50 -l "Load Range" -c "LOAD";
+        button -w 200 -h 50 -l "Save Range" -c "SAVE";
+
+showWindow AnimationRanges;
+
+proc LOAD () {
+    //print("This is Load");
+    string $theFile = `file -q -sn -shn`;
+    string $pathFile = `file -q -sn`;
+    string $pathDir = dirname( $pathFile );
+    
+    string $filePath = "/mel.txt" ;
+    
+    string $fileRange = $pathDir + $filePath ;
+    
+    
+    $fileId = `fopen $fileRange "r"` ;
+    
+    string $data = `fread $fileId $data` ;
+    
+    eval($data);
+}
+
+proc SAVE () {
+    //print("This is Save");
+    float $min = `playbackOptions -q -min`;
+    float $max = `playbackOptions -q -max`;
+    float $ast = `playbackOptions -q -ast`;
+    float $aet = `playbackOptions -q -aet`;
+    float $current = `currentTime -q`;
+    
+    // Create A String Array With Commands  
+    string $line1 = `format -stringArg $min -stringArg $max "playbackOptions -min ^1s -max ^2s ;"`;
+    string $line2 = `format -stringArg $ast -stringArg $aet "playbackOptions -ast ^1s -aet ^2s ;"`;
+    string $line3 = `format -stringArg $current "currentTime ^1s ;"`;
+    string $output[] = {$line1, $line2, $line3} ;
+    
+    // Define Your File Path  
+    string $theFile = `file -q -sn -shn`;
+    string $pathFile = `file -q -sn`;
+    string $pathDir = dirname( $pathFile );
+    string $filePath = "/mel.txt" ;
+    string $fileRange = $pathDir + $filePath ;
+    
+    // Open Your File  
+    $fileId = `fopen $fileRange "w+"` ;  
+      
+    // Print Array To File  
+    for($line in $output)  
+    fprint $fileId ($line+"\n") ;  
+      
+    // Close File  
+    fclose $fileId ;
+}
