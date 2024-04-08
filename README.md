@@ -7,7 +7,7 @@
 ###
 
 <div align="center">
-  <img height="200" src="maya.png"  />
+  <img src="maya.png"  />
 </div>
 
 ###
